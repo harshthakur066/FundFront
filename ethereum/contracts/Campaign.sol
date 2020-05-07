@@ -1,57 +1,53 @@
 pragma solidity ^0.4.17;
 
-
 contract CampaignFactory {
-    address[] public deployedCampaigns;
-
-    function createCampaign(uint256 minimun) public {
+    address[] public deployedCampagins;
+    
+    function createCampagin(uint minimun) public {
         address newCampaign = new Campaign(minimun, msg.sender);
-        deployedCampaigns.push(newCampaign);
+        deployedCampagins.push(newCampaign);
     }
-
-    function getDeployedCampaigns() public view returns (address[]) {
-        return deployedCampaigns;
+    
+    function getDeployedCampaigns() public view returns(address[]) {
+        return deployedCampagins;
     }
 }
 
-
 contract Campaign {
+    
     struct Request {
         string description;
-        uint256 value;
+        uint value;
         address recipient;
         bool complete;
-        mapping(address => bool) approvals;
-        uint256 approvalsCount;
+        mapping(address => bool)approvals;
+        uint approvalsCount;
     }
-
+    
     Request[] public request;
     address public manager;
-    uint256 public minimumContribution;
+    uint public minimumContribution;
     mapping(address => bool) public approvers;
-    uint256 approversCount;
-
+    uint approversCount;
+    
     modifier restricted() {
         require(msg.sender == manager);
         _;
     }
-
-    function Campaign(uint256 minimum, address creator) public {
+    
+    function Campaign(uint minimum, address creator) public {
         manager = creator;
         minimumContribution = minimum;
     }
-
+    
     function contribute() public payable {
         require(msg.value > minimumContribution);
         approversCount++;
-
+        
         approvers[msg.sender] = true;
     }
-
-    function createRequest(string description, uint256 value, address recipient)
-        public
-        restricted
-    {
+    
+    function createRequest(string description, uint value, address recipient) public restricted {
         Request memory newRequest = Request({
             description: description,
             value: value,
@@ -59,24 +55,25 @@ contract Campaign {
             complete: false,
             approvalsCount: 0
         });
-
+        
         request.push(newRequest);
     }
-
-    function approveRequest(uint256 index) public {
+    
+    function approveRequest(uint index) public {
         Request storage req = request[index];
-
+        
         require(approvers[msg.sender]);
         require(!req.approvals[msg.sender]);
-
+        
         req.approvals[msg.sender] = true;
         req.approvalsCount++;
     }
-
-    function finalRequest(uint256 index) public restricted {
+    
+    
+    function finalizeRequest(uint index) public restricted {
         Request storage req = request[index];
 
-        require(req.approvalsCount > approversCount / 2);
+        require(req.approvalsCount > (approversCount / 2));
         require(!req.complete);
 
         req.recipient.transfer(req.value);
