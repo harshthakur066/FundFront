@@ -1,53 +1,57 @@
 pragma solidity ^0.4.17;
 
+
 contract CampaignFactory {
     address[] public deployedCampagins;
-    
-    function createCampaign(uint minimun) public {
+
+    function createCampaign(uint256 minimun) public {
         address newCampaign = new Campaign(minimun, msg.sender);
         deployedCampagins.push(newCampaign);
     }
-    
-    function getDeployedCampaigns() public view returns(address[]) {
+
+    function getDeployedCampaigns() public view returns (address[]) {
         return deployedCampagins;
     }
 }
 
+
 contract Campaign {
-    
     struct Request {
         string description;
-        uint value;
+        uint256 value;
         address recipient;
         bool complete;
-        mapping(address => bool)approvals;
-        uint approvalsCount;
+        mapping(address => bool) approvals;
+        uint256 approvalsCount;
     }
-    
+
     Request[] public request;
     address public manager;
-    uint public minimumContribution;
+    uint256 public minimumContribution;
     mapping(address => bool) public approvers;
-    uint approversCount;
-    
+    uint256 approversCount;
+
     modifier restricted() {
         require(msg.sender == manager);
         _;
     }
-    
-    function Campaign(uint minimum, address creator) public {
+
+    function Campaign(uint256 minimum, address creator) public {
         manager = creator;
         minimumContribution = minimum;
     }
-    
+
     function contribute() public payable {
         require(msg.value > minimumContribution);
         approversCount++;
-        
+
         approvers[msg.sender] = true;
     }
-    
-    function createRequest(string description, uint value, address recipient) public restricted {
+
+    function createRequest(string description, uint256 value, address recipient)
+        public
+        restricted
+    {
         Request memory newRequest = Request({
             description: description,
             value: value,
@@ -55,22 +59,21 @@ contract Campaign {
             complete: false,
             approvalsCount: 0
         });
-        
+
         request.push(newRequest);
     }
-    
-    function approveRequest(uint index) public {
+
+    function approveRequest(uint256 index) public {
         Request storage req = request[index];
-        
+
         require(approvers[msg.sender]);
         require(!req.approvals[msg.sender]);
-        
+
         req.approvals[msg.sender] = true;
         req.approvalsCount++;
     }
-    
-    
-    function finalizeRequest(uint index) public restricted {
+
+    function finalizeRequest(uint256 index) public restricted {
         Request storage req = request[index];
 
         require(req.approvalsCount > (approversCount / 2));
@@ -78,5 +81,23 @@ contract Campaign {
 
         req.recipient.transfer(req.value);
         req.complete = true;
+    }
+
+    function getSummary()
+        public
+        view
+        returns (uint256, uint256, uint256, uint256, address)
+    {
+        return (
+            minimumContribution,
+            this.balance,
+            request.length,
+            approversCount,
+            manager
+        );
+    }
+
+    function getRequestsCount() public view returns (uint256) {
+        return request.length;
     }
 }

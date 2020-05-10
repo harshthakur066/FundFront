@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import factory from "../ethereum/factory";
 import { Card, Button } from "semantic-ui-react";
 import Layout from "../components/Layout";
@@ -17,7 +17,11 @@ const CampaignIndex = ({ campaigns }) => {
         fluid: true,
       };
     });
-    return <Card.Group items={items} />;
+    return items.length ? (
+      <Card.Group items={items} />
+    ) : (
+      <h3 style={{ marginTop: 40 }}>No campaigns yet...</h3>
+    );
   };
 
   return (
@@ -30,7 +34,7 @@ const CampaignIndex = ({ campaigns }) => {
             content="Create Campaign"
             icon="add"
             primary
-          />{" "}
+          />
         </a>
       </Link>
       <div> {renderCampaigns()} </div>
