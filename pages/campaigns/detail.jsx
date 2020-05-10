@@ -1,10 +1,12 @@
 import React from "react";
-import { Card } from "semantic-ui-react";
+import { Card, Grid, GridColumn } from "semantic-ui-react";
 import Layout from "../../components/Layout";
 import Campaign from "../../ethereum/campaign";
 import web3 from "../../ethereum/web3";
+import ContributeForm from "../../components/ContributeForm";
 
 const CampaignDetail = ({
+  address,
   minimumContribution,
   balance,
   requestsCount,
@@ -52,7 +54,12 @@ const CampaignDetail = ({
   return (
     <Layout>
       <h2>Campaign Details</h2>
-      {renderCards()}
+      <Grid>
+        <Grid.Column width={10}>{renderCards()}</Grid.Column>
+        <Grid.Column width={6}>
+          <ContributeForm address={address} />
+        </Grid.Column>
+      </Grid>
     </Layout>
   );
 };
@@ -62,6 +69,7 @@ CampaignDetail.getInitialProps = async ({ query }) => {
   const summary = await campaign.methods.getSummary().call();
   //   console.log(summary); //returns a result oject with keys in n. 0,1,2...
   return {
+    address: query.address,
     minimumContribution: summary[0],
     balance: summary[1],
     requestsCount: summary[2],
