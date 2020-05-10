@@ -17,7 +17,7 @@ const CampaignIndex = ({ campaigns }) => {
 
   return (
     <Layout>
-      <h1>Open Campaigns</h1>
+      <h2>Open Campaigns</h2>
       <div>
         <Button floated="right" content="Create Campaign" icon="add" primary />
       </div>
