@@ -7,3 +7,9 @@ A web-app based on ethereum smart contracts, a better solution to the kickstart 
 1. `npm install`
 
 2. `npm run dev`
+
+
+## Note:
+
+Please add [MetaMask](https://metamask.io/) extension to your browser for transactions and set it to the rinkeby network.
+You can get free ethers for development from [Rinkeby Authenticated Faucet](https://faucet.rinkeby.io/)
